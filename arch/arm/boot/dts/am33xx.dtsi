@@ -253,7 +253,7 @@
 			dmas = <&edma 24
 				&edma 25>;
 			dma-names = "tx", "rx";
-			status = "disabled";
+			status = "okay";
 		};
 
 		mmc2: mmc@481d8000 {
