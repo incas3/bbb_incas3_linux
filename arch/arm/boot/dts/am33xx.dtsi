@@ -264,7 +264,7 @@
 			dmas = <&edma 2
 				&edma 3>;
 			dma-names = "tx", "rx";
-			status = "disabled";
+			status = "okay";
 		};
 
 		mmc3: mmc@47810000 {
