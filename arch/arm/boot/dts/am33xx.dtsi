@@ -624,7 +624,10 @@
 			ti,hwmods = "mcasp0";
 			reg = <0x48038000 0x2000>;
 			interrupts = <80 81>;
-			status = "disabled";
+			status = "enabled";
+            num-serializers = <2>;
+            serial-dir = "rx", "tx";
+            tdm-slots = <2>;
 			asp-chan-q = <2>;	/* EVENTQ_2 */
 			tx-dma-offset = <0x46000000>;
 			rx-dma-offset = <0x46000000>;

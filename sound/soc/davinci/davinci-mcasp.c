@@ -354,10 +354,10 @@ static void mcasp_start_rx(struct davinci_audio_dev *dev)
 
 	mcasp_set_ctl_reg(dev->base + DAVINCI_MCASP_GBLCTLR_REG, RXSMRST);
 	mcasp_set_ctl_reg(dev->base + DAVINCI_MCASP_GBLCTLR_REG, RXFSRST);
-	mcasp_set_reg(dev->base + DAVINCI_MCASP_RXBUF_REG, 0);
+    /*mcasp_set_reg(dev->base + DAVINCI_MCASP_RXBUF_REG, 0);
 
 	mcasp_set_ctl_reg(dev->base + DAVINCI_MCASP_GBLCTLR_REG, RXSMRST);
-	mcasp_set_ctl_reg(dev->base + DAVINCI_MCASP_GBLCTLR_REG, RXFSRST);
+	mcasp_set_ctl_reg(dev->base + DAVINCI_MCASP_GBLCTLR_REG, RXFSRST);*/
 }
 
 static void mcasp_start_tx(struct davinci_audio_dev *dev)
@@ -675,12 +675,10 @@ static void davinci_hw_common_param(struct davinci_audio_dev *dev, int stream)
 
 	if (stream == SNDRV_PCM_STREAM_PLAYBACK) {
 		mcasp_set_reg(dev->base + DAVINCI_MCASP_TXSTAT_REG, 0xFFFFFFFF);
-		mcasp_clr_bits(dev->base + DAVINCI_MCASP_XEVTCTL_REG,
-				TXDATADMADIS);
+		mcasp_clr_bits(dev->base + DAVINCI_MCASP_XEVTCTL_REG, TXDATADMADIS);
 	} else {
 		mcasp_set_reg(dev->base + DAVINCI_MCASP_RXSTAT_REG, 0xFFFFFFFF);
-		mcasp_clr_bits(dev->base + DAVINCI_MCASP_REVTCTL_REG,
-				RXDATADMADIS);
+		mcasp_clr_bits(dev->base + DAVINCI_MCASP_REVTCTL_REG, RXDATADMADIS);
 	}
 
 	for (i = 0; i < dev->num_serializer; i++) {

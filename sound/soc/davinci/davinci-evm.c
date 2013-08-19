@@ -268,6 +268,16 @@ static struct snd_soc_dai_link da850_evm_dai = {
 	.ops = &evm_ops,
 };
 
+static struct snd_soc_dai_link am335x_evm_dai = {
+	.name = "INCAS3_ADM",
+	.stream_name = "i3_adm",
+	.cpu_dai_name = "davinci-mcasp.0",
+	.codec_dai_name = "adm_mod-hifi",
+	.codec_name = "spi1.1",
+	.platform_name = "davinci-mcasp.0",
+	.ops = &evm_ops,
+};
+
 /* davinci dm6446 evm audio machine driver */
 static struct snd_soc_card dm6446_snd_soc_card_evm = {
 	.name = "DaVinci DM6446 EVM",
