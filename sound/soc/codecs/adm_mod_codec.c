@@ -3,6 +3,7 @@
 #include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/spi/spi.h>
+#include <linux/platform_device.h>
 #include <sound/pcm.h>
 #include <sound/pcm_params.h>
 #include <sound/core.h>
@@ -405,12 +406,19 @@ static int __devexit adm_mod_spi_remove(struct spi_device *spi)
 	return 0;
 }
 
-static struct spi_driver adm_mod_spi_driver = 
+static const struct of_device_id my_of_ids[] = {
+    { .compatible = "adm_mod-codec" },
+    {},
+};
+
+
+static struct platform_driver adm_mod_spi_driver = 
 {
     .driver  = 
     {
         .name   = "adm_mod-codec",
         .owner  = THIS_MODULE,
+        .of_match_table = my_of_ids,
     },
     .probe  = adm_mod_spi_probe,
     .remove = __devexit_p(adm_mod_spi_remove),
@@ -418,13 +426,13 @@ static struct spi_driver adm_mod_spi_driver =
 
 static int __init adm_mod_init(void)
 {
-	return spi_register_driver(&adm_mod_spi_driver);
+	return platform_register_driver(&adm_mod_spi_driver);
 }
 module_init(adm_mod_init);
 
 static void __exit adm_mod_exit(void)
 {
-	spi_unregister_driver(&adm_mod_spi_driver);
+	platform_unregister_driver(&adm_mod_spi_driver);
 }
 module_exit(adm_mod_exit);
 
