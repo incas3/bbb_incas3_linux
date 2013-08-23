@@ -52,7 +52,6 @@
 	reset-names = "eMMC_RSTn-CONSUMER";
 };
 
-
 &cpu {
 	/*
 	 * To consider voltage drop between PMIC and SoC,
@@ -67,3 +66,24 @@
 		300000   969000
 	>;
 };
+
+/ {
+    incas3 { 
+        sound {
+            compatible = "adm-mod_codec";
+
+            adc_pcm_en     = "0x870"; /* GPMC_WAIT0 */
+            adc_mbo_en     = "0x874"; /* GPMC_WPn */
+            adc_dsd_en     = "0x840"; /* GPMC_A0 */
+            adc_pcm_ms     = "0x844"; /* GPMC_A1 */
+            adc_mdiv       = "0x9AC"; /* MCASP0_AHCLKX */
+            adc_hpfb       = "0x9A4"; /* MCASP_FSR */
+            adc_mode0      = "0x848"; /* GPMC_A2 */
+            adc_mode1      = "0x84C"; /* GPMC_A3 */
+            adc_rst        = "0x984"; /* UART1_TXD */
+            dac_relais     = "0x81C"; /* GPMC_AD7 */
+        };
+    }; 
+};
+
+

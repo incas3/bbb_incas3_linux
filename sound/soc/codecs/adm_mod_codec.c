@@ -4,6 +4,9 @@
 #include <linux/slab.h>
 #include <linux/spi/spi.h>
 #include <linux/platform_device.h>
+#include <linux/of.h>
+#include <linux/of_platform.h>
+#include <linux/of_device.h>
 #include <sound/pcm.h>
 #include <sound/pcm_params.h>
 #include <sound/core.h>
@@ -335,22 +338,96 @@ static int adm_mod_request_gpio(unsigned int gpio)
     return ret;
 }
 
-static int adm_mod_spi_probe(struct spi_device *spi)
+static const struct of_device_id adm_mod_dts_ids[] = {
+    { .compatible = "adm_mod-codec" },
+    {},
+};
+
+
+static struct adm_mod_codec_pdata *adm_mod_set_pdata_from_of(
+						struct platform_device *pdev)
+{
+	struct device_node *np = pdev->dev.of_node;
+    struct adm_mod_codec_pdata *pdata = NULL;
+	const struct of_device_id *match =
+			of_match_device(of_match_ptr(adm_mod_dts_ids), &pdev->dev);
+
+	const u32 *of_serial_dir32;
+	u8 *of_serial_dir;
+	u32 val;
+	int i, ret = 0;
+
+	if (pdev->dev.platform_data) {
+		pdata = pdev->dev.platform_data;
+		return pdata;
+	} else if (match) {
+		pdata = devm_kzalloc(&pdev->dev, sizeof(*pdata), GFP_KERNEL);
+		if (!pdata) {
+			ret = -ENOMEM;
+			goto nodata;
+		}
+	} else {
+		/* control shouldn't reach here. something is wrong */
+		ret = -EINVAL;
+		goto nodata;
+	}
+
+	ret = of_property_read_u32(np, "adc_pcm_en", &val);
+	if (ret >= 0)
+		pdata->adc_pcm_en = val;
+    ret = of_property_read_u32(np, "adc_mbo_en", &val);
+	if (ret >= 0)
+		pdata->adc_mbo_en = val;
+    ret = of_property_read_u32(np, "adc_dsd_en", &val);
+	if (ret >= 0)
+		pdata->adc_dsd_en = val;
+    ret = of_property_read_u32(np, "adc_pcm_ms", &val);
+	if (ret >= 0)
+		pdata->adc_pcm_ms = val;
+    ret = of_property_read_u32(np, "adc_mdiv", &val);
+	if (ret >= 0)
+		pdata->adc_mdiv = val;
+    ret = of_property_read_u32(np, "adc_hpfb", &val);
+	if (ret >= 0)
+		pdata->adc_hpfb = val;
+    ret = of_property_read_u32(np, "adc_mode0", &val);
+	if (ret >= 0)
+		pdata->adc_mode0 = val;
+    ret = of_property_read_u32(np, "adc_mode1", &val);
+	if (ret >= 0)
+		pdata->adc_mode1 = val;
+    ret = of_property_read_u32(np, "adc_rst", &val);
+	if (ret >= 0)
+		pdata->adc_rst = val;
+
+	return  pdata;
+
+nodata:
+	if (ret < 0) {
+		dev_err(&pdev->dev, "Error populating platform data, err %d\n",
+			ret);
+		pdata = NULL;
+	}
+	return  pdata;
+}
+
+
+static int adm_mod_spi_probe(struct platform_device *spi)
 {
 	struct adm_mod_private *adm_mod_priv;
 	int ret;
 
-	spi->bits_per_word = 8;
-	spi->mode = SPI_MODE_0;
-	ret = spi_setup(spi);
-	if (ret < 0) return ret;
+	if (!spi->dev.platform_data && !spi->dev.of_node) {
+		dev_err(&spi->dev, "No platform data supplied\n");
+		return -EINVAL;
+	}
 
-	adm_mod_priv = kzalloc(sizeof(struct adm_mod_private), GFP_KERNEL);
-	if (adm_mod_priv == NULL) return -ENOMEM;
+    adm_mod_priv = kzalloc(sizeof(struct adm_mod_private), GFP_KERNEL);
+    if (adm_mod_priv == NULL) return -ENOMEM;
 
 	adm_mod_priv->control_data = spi;
 	adm_mod_priv->control_type = SND_SOC_SPI;
-	spi_set_drvdata(spi, adm_mod_priv);
+	platform_set_drvdata(spi, adm_mod_priv);
 
 	ret = snd_soc_register_codec(&spi->dev,
 			&soc_codec_dev_adm_mod, &adm_mod_dai, 1);
@@ -359,7 +436,11 @@ static int adm_mod_spi_probe(struct spi_device *spi)
         goto soc_register_fail;
     }
 
-    adm_mod_priv->gpios = (struct adm_mod_codec_pdata *) spi->dev.platform_data;
+	adm_mod_priv->gpios = adm_mod_set_pdata_from_of(spi);
+	if (!adm_mod_priv->gpios) {
+		dev_err(&spi->dev, "no platform data\n");
+		return -EINVAL;
+	}
 
     ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_pcm_en);
     if (ret != 0) goto gpio_fail;
@@ -395,22 +476,16 @@ static int adm_mod_spi_probe(struct spi_device *spi)
 gpio_fail:
 	snd_soc_unregister_codec(&spi->dev);
 soc_register_fail:
-	kfree(spi_get_drvdata(spi));
+	kfree(platform_get_drvdata(spi));
     return ret;
 }
 
-static int __devexit adm_mod_spi_remove(struct spi_device *spi)
+static int adm_mod_spi_remove(struct platform_device *spi)
 {
 	snd_soc_unregister_codec(&spi->dev);
-	kfree(spi_get_drvdata(spi));
+	kfree(platform_get_drvdata(spi));
 	return 0;
 }
-
-static const struct of_device_id my_of_ids[] = {
-    { .compatible = "adm_mod-codec" },
-    {},
-};
-
 
 static struct platform_driver adm_mod_spi_driver = 
 {
@@ -418,21 +493,21 @@ static struct platform_driver adm_mod_spi_driver =
     {
         .name   = "adm_mod-codec",
         .owner  = THIS_MODULE,
-        .of_match_table = my_of_ids,
+        .of_match_table = adm_mod_dts_ids,
     },
     .probe  = adm_mod_spi_probe,
-    .remove = __devexit_p(adm_mod_spi_remove),
+    .remove = adm_mod_spi_remove,
 };
 
 static int __init adm_mod_init(void)
 {
-	return platform_register_driver(&adm_mod_spi_driver);
+    return platform_driver_register(&adm_mod_spi_driver);
 }
 module_init(adm_mod_init);
 
 static void __exit adm_mod_exit(void)
 {
-	platform_unregister_driver(&adm_mod_spi_driver);
+    platform_driver_unregister(&adm_mod_spi_driver);
 }
 module_exit(adm_mod_exit);
 
