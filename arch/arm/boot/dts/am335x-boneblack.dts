@@ -67,23 +67,46 @@
 	>;
 };
 
-/ {
-    incas3 { 
-        sound {
-            compatible = "adm-mod_codec";
+&mcasp0 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&mcasp0_pins>;
 
-            adc_pcm_en     = "0x870"; /* GPMC_WAIT0 */
-            adc_mbo_en     = "0x874"; /* GPMC_WPn */
-            adc_dsd_en     = "0x840"; /* GPMC_A0 */
-            adc_pcm_ms     = "0x844"; /* GPMC_A1 */
-            adc_mdiv       = "0x9AC"; /* MCASP0_AHCLKX */
-            adc_hpfb       = "0x9A4"; /* MCASP_FSR */
-            adc_mode0      = "0x848"; /* GPMC_A2 */
-            adc_mode1      = "0x84C"; /* GPMC_A3 */
-            adc_rst        = "0x984"; /* UART1_TXD */
-            dac_relais     = "0x81C"; /* GPMC_AD7 */
-        };
-    }; 
+    status = "okay";
+
+    op-mode = <0>; /*  MCASP_IIS_MODE */
+    num-serializer = <4>;
+    serial-dir = < 2 1 0 2 >; /* 0: INACTIVE, 1: TX, 2: RX */
+    tdm-slots = <2>;
+
+    tx-num-evt = <1>;
+    rx-num-evt = <1>;
 };
 
+/ {
+    ocp {
+        codec: adc@1 { 
+            compatible = "adm_mod-codec";
+            status = "okay";
 
+            /* 32 * <bank> + <gpio> */
+            adc_pcm_en = <30>; /* pin a11: gpio0[30] */
+            adc_mbo_en = <31>; /* pin a13: gpio0[31] */ 
+            adc_dsd_en = <48>; /* pin a15: gpio1[16] */ 
+            adc_pcm_ms = <49>; /* pin a23: gpio1[17] */
+            adc_mdiv = <117>; /* pin a25: gpio3[21] */
+            adc_hpfb = <115>; /* pin a27: gpio3[19] */
+            adc_mode0 = <51>; /* pin a14: gpio1[19] */
+            adc_mode1 = <50>; /* pin a16: gpio1[18] */
+            adc_rst = <15>; /* pin a24: gpio0[15] */
+            dac_relais = <60>; /* pin b04: gpio1[28] */
+        };
+
+        sound {
+            compatible = "ti,am33xx-beaglebone-black";
+            ti,model = "INCAS3 ADM";
+            ti,audio-codec = <&codec>;
+            ti,mcasp-controller = <&mcasp0>;
+            ti,codec-clock-rate = <12000000>;
+        };
+    };
+};

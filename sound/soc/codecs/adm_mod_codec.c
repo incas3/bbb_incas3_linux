@@ -1,4 +1,4 @@
-//#define DEBUG
+#define DEBUG
 
 #include <linux/module.h>
 #include <linux/slab.h>
@@ -352,10 +352,9 @@ static struct adm_mod_codec_pdata *adm_mod_set_pdata_from_of(
 	const struct of_device_id *match =
 			of_match_device(of_match_ptr(adm_mod_dts_ids), &pdev->dev);
 
-	const u32 *of_serial_dir32;
-	u8 *of_serial_dir;
-	u32 val;
-	int i, ret = 0;
+	int val, ret = 0;
+
+    printk("adm_mod_set_pdata_from_of\n");
 
 	if (pdev->dev.platform_data) {
 		pdata = pdev->dev.platform_data;
@@ -372,34 +371,17 @@ static struct adm_mod_codec_pdata *adm_mod_set_pdata_from_of(
 		goto nodata;
 	}
 
-	ret = of_property_read_u32(np, "adc_pcm_en", &val);
-	if (ret >= 0)
-		pdata->adc_pcm_en = val;
-    ret = of_property_read_u32(np, "adc_mbo_en", &val);
-	if (ret >= 0)
-		pdata->adc_mbo_en = val;
-    ret = of_property_read_u32(np, "adc_dsd_en", &val);
-	if (ret >= 0)
-		pdata->adc_dsd_en = val;
-    ret = of_property_read_u32(np, "adc_pcm_ms", &val);
-	if (ret >= 0)
-		pdata->adc_pcm_ms = val;
-    ret = of_property_read_u32(np, "adc_mdiv", &val);
-	if (ret >= 0)
-		pdata->adc_mdiv = val;
-    ret = of_property_read_u32(np, "adc_hpfb", &val);
-	if (ret >= 0)
-		pdata->adc_hpfb = val;
-    ret = of_property_read_u32(np, "adc_mode0", &val);
-	if (ret >= 0)
-		pdata->adc_mode0 = val;
-    ret = of_property_read_u32(np, "adc_mode1", &val);
-	if (ret >= 0)
-		pdata->adc_mode1 = val;
-    ret = of_property_read_u32(np, "adc_rst", &val);
-	if (ret >= 0)
-		pdata->adc_rst = val;
+	ret = of_property_read_u32(np, "adc_pcm_en", &pdata->adc_pcm_en);
+    ret = of_property_read_u32(np, "adc_mbo_en", &pdata->adc_mbo_en);
+    ret = of_property_read_u32(np, "adc_dsd_en", &pdata->adc_dsd_en);
+    ret = of_property_read_u32(np, "adc_pcm_ms", &pdata->adc_pcm_ms);
+    ret = of_property_read_u32(np, "adc_mdiv", &pdata->adc_mdiv);
+    ret = of_property_read_u32(np, "adc_hpfb", &pdata->adc_hpfb);
+    ret = of_property_read_u32(np, "adc_mode0", &pdata->adc_mode0);
+    ret = of_property_read_u32(np, "adc_mode1", &pdata->adc_mode1);
+    ret = of_property_read_u32(np, "adc_rst", &pdata->adc_rst);
 
+    printk("adm_mod pcm_en: 0x%X\n", pdata->adc_pcm_en);
 	return  pdata;
 
 nodata:
@@ -428,6 +410,8 @@ static int adm_mod_spi_probe(struct platform_device *spi)
 	adm_mod_priv->control_data = spi;
 	adm_mod_priv->control_type = SND_SOC_SPI;
 	platform_set_drvdata(spi, adm_mod_priv);
+
+    printk("amd_mod name: %s\n", spi->dev.of_node->name);
 
 	ret = snd_soc_register_codec(&spi->dev,
 			&soc_codec_dev_adm_mod, &adm_mod_dai, 1);

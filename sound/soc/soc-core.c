@@ -45,6 +45,8 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/asoc.h>
 
+#define dev_dbg(dev, format, arg...)		dev_printk(KERN_DEBUG, dev, format, ##arg)
+
 #define NAME_SIZE	32
 
 static DECLARE_WAIT_QUEUE_HEAD(soc_pm_waitq);
@@ -330,6 +332,8 @@ static ssize_t codec_list_read_file(struct file *file, char __user *user_buf,
 	list_for_each_entry(codec, &codec_list, list) {
 		len = snprintf(buf + ret, PAGE_SIZE - ret, "%s\n",
 			       codec->name);
+
+        printk("Registering CODEC: %s\n", codec->name);
 		if (len >= 0)
 			ret += len;
 		if (ret > PAGE_SIZE) {
@@ -823,6 +827,7 @@ static int soc_bind_dai_link(struct snd_soc_card *card, int num)
 	struct snd_soc_dai *codec_dai, *cpu_dai;
 	const char *platform_name;
 
+	printk("ASoC: binding %s at idx %d\n", dai_link->name, num);
 	dev_dbg(card->dev, "ASoC: binding %s at idx %d\n", dai_link->name, num);
 
 	/* Find CPU DAI from registered DAIs*/
@@ -841,6 +846,8 @@ static int soc_bind_dai_link(struct snd_soc_card *card, int num)
 	}
 
 	if (!rtd->cpu_dai) {
+		printk("ASoC: CPU DAI %s not registered\n",
+			dai_link->cpu_dai_name);
 		dev_err(card->dev, "ASoC: CPU DAI %s not registered\n",
 			dai_link->cpu_dai_name);
 		return -EPROBE_DEFER;
@@ -1124,6 +1131,8 @@ static int soc_probe_codec(struct snd_soc_card *card,
 	codec->probed = 1;
 	list_add(&codec->card_list, &card->codec_dev_list);
 	list_add(&codec->dapm.list, &card->dapm_list);
+
+    printk("ASoC: probing CODEC: %s\n", codec->name);
 
 	return 0;
 
@@ -3562,8 +3571,10 @@ int snd_soc_register_card(struct snd_soc_card *card)
 {
 	int i, ret;
 
-	if (!card->name || !card->dev)
+	if (!card->name || !card->dev) {
+        dev_err(card->dev, "ASoC: card name or device not set for %s\n", card->name);
 		return -EINVAL;
+    }
 
 	for (i = 0; i < card->num_links; i++) {
 		struct snd_soc_dai_link *link = &card->dai_link[i];
