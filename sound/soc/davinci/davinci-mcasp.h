@@ -23,7 +23,7 @@
 
 #include "davinci-pcm.h"
 
-#define DAVINCI_MCASP_RATES	SNDRV_PCM_RATE_8000_192000
+#define DAVINCI_MCASP_RATES	SNDRV_PCM_RATE_8000_384000
 #define DAVINCI_MCASP_I2S_DAI	0
 #define DAVINCI_MCASP_DIT_DAI	1
 
@@ -38,7 +38,7 @@ struct davinci_audio_dev {
 	u8	num_serializer;
 	u8	*serial_dir;
 	u8	version;
-	u8	bclk_lrclk_ratio;
+	u16	bclk_lrclk_ratio;
 
 	/* McASP FIFO related */
 	u8	txnumevt;
