@@ -101,7 +101,7 @@
             dac_relais = <60>; /* pin b04: gpio1[28] */
         };
 
-        sound {
+        sound_incas3 {
             compatible = "ti,am33xx-beaglebone-black";
             ti,model = "INCAS3 ADM";
             ti,audio-codec = <&codec>;
