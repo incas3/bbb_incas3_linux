@@ -198,8 +198,8 @@ fw-shipped-$(CONFIG_CAPE_BEAGLEBONE_NIXIE) += \
 fw-shipped-$(CONFIG_CAPE_BEAGLEBONE) += cape-bone-weather-00A0.dtbo
 
 # the HDMI virtual capes on the beaglebone-black
-fw-shipped-$(CONFIG_CAPE_BEAGLEBONE) += \
-	cape-boneblack-hdmi-00A0.dtbo cape-boneblack-hdmin-00A0.dtbo
+#fw-shipped-$(CONFIG_CAPE_BEAGLEBONE) += \
+#	cape-boneblack-hdmi-00A0.dtbo cape-boneblack-hdmin-00A0.dtbo
 
 # the Tester cape (tester-side)
 fw-shipped-$(CONFIG_CAPE_BEAGLEBONE) += cape-bone-tester-00A0.dtbo

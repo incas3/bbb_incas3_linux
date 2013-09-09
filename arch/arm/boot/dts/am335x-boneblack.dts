@@ -18,6 +18,32 @@
 			0x50 0x17	/* gpmc_a4.gpio1_20, OUTPUT | MODE7 | PULLUP */
 		>;
 	};
+
+    mcasp0_pins_incas3: pinmux_mcasp0_pins {
+		pinctrl-single,pins = <
+            0x0d0 0x2b /* p8_35, MUX_MODE3 | PIN_INPUT_PULLDOWN */
+            0x0d4 0x2b /* p8_33, MUX_MODE3 | PIN_INPUT_PULLDOWN */
+            0x0c8 0x2b /* p8_36, MUX_MODE3 | PIN_INPUT_PULLDOWN */
+
+            0x0c0 0x2b /* p8_37, MUX_MODE3 | PIN_INPUT_PULLDOWN */
+            0x0c4 0x2b /* p8_38, MUX_MODE3 | PIN_INPUT_PULLDOWN */
+            0x0d8 0x0b /* p8_31, MUX_MODE3 | PIN_OUTPUT */
+        >;
+    };
+    adc_pins: pinmux_adc_pins {
+		pinctrl-single,pins = <
+            0x070 0x0f /* p9_11, MUX_MODE7 | PIN_OUTPUT adc_pcm_en */
+            0x074 0x0f /* p9_13, MUX_MODE7 | PIN_OUTPUT adc_mbo_en */
+            0x040 0x0f /* p9_15, MUX_MODE7 | PIN_OUTPUT adc_dsd_en */
+            0x044 0x0f /* p9_23, MUX_MODE7 | PIN_OUTPUT adc_pcm_ms */
+            0x1ac 0x0f /* p9_25, MUX_MODE7 | PIN_OUTPUT adc_mdiv */
+            0x1a4 0x0f /* p9_27, MUX_MODE7 | PIN_OUTPUT adc_hpfb */
+            0x048 0x0f /* p9_14, MUX_MODE7 | PIN_OUTPUT adc_mode0 */
+            0x04c 0x0f /* p9_16, MUX_MODE7 | PIN_OUTPUT adc_mode1 */
+            0x184 0x0f /* p9_24, MUX_MODE7 | PIN_OUTPUT adc_rst */
+            0x028 0x0f /* p8_14, MUX_MODE7 | PIN_OUTPUT bb_detect */
+        >;
+    };
 };
 
 &ldo3_reg {
@@ -69,13 +95,13 @@
 
 &mcasp0 {
     pinctrl-names = "default";
-    pinctrl-0 = <&mcasp0_pins>;
+    pinctrl-0 = <&mcasp0_pins_incas3>;
 
     status = "okay";
 
     op-mode = <0>; /*  MCASP_IIS_MODE */
-    num-serializer = <4>;
-    serial-dir = < 2 1 0 2 >; /* 0: INACTIVE, 1: TX, 2: RX */
+    num-serializer = <2>;
+    serial-dir = < 2 1 >; /* 0: INACTIVE, 1: TX, 2: RX */
     tdm-slots = <2>;
 
     tx-num-evt = <1>;
@@ -87,6 +113,8 @@
         codec: adc@1 { 
             compatible = "adm_mod-codec";
             status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&adc_pins>;
 
             /* 32 * <bank> + <gpio> */
             adc_pcm_en = <30>; /* pin a11: gpio0[30] */
@@ -98,7 +126,7 @@
             adc_mode0 = <51>; /* pin a14: gpio1[19] */
             adc_mode1 = <50>; /* pin a16: gpio1[18] */
             adc_rst = <15>; /* pin a24: gpio0[15] */
-            dac_relais = <60>; /* pin b04: gpio1[28] */
+            bb_detect = <26>; /* pin b04: gpio0[28] */
         };
 
         sound_incas3 {

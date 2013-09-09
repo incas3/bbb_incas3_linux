@@ -12,7 +12,7 @@ struct adm_mod_codec_pdata
     unsigned int adc_mode0;
     unsigned int adc_mode1;
     unsigned int adc_rst;
-    unsigned int dac_relais;
+    unsigned int bb_detect;
 };
 
 #endif /*ADM_MOD_CODEC_H_*/

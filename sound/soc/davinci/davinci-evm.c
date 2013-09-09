@@ -429,6 +429,7 @@ static int davinci_evm_probe(struct platform_device *pdev)
 	if (!evm_dai.cpu_of_node)
 		return -EINVAL;
 
+    printk("codec name: %s\n", evm_dai.codec_of_node->name);
 	evm_dai.platform_of_node = evm_dai.cpu_of_node;
 
 	evm_soc_card.dev = &pdev->dev;

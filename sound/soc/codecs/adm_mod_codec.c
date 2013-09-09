@@ -13,6 +13,7 @@
 #include <sound/soc.h>
 #include <sound/initval.h>
 #include <sound/asoundef.h>
+#include <linux/pinctrl/consumer.h>
 
 #include <linux/kthread.h>  // for threads
 #include <linux/sched.h>  // for task_struct
@@ -282,14 +283,14 @@ static struct snd_soc_dai_driver adm_mod_dai = {
 	.playback = {
 		.stream_name = "ADM Playback",
 		.channels_min = 2,
-		.channels_max = 2,
+		.channels_max = 6,
 		.rates = SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_96000 | SNDRV_PCM_RATE_192000 | SNDRV_PCM_RATE_384000,
         .formats = ( SNDRV_PCM_FMTBIT_S32_LE | SNDRV_PCM_FMTBIT_S32_BE  )
     },
 	.capture = {
 		.stream_name = "ADM Capture",
 		.channels_min = 2,
-		.channels_max = 2,
+		.channels_max = 6,
 		.rates = SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_96000 | SNDRV_PCM_RATE_192000 | SNDRV_PCM_RATE_384000,
         .formats = ( SNDRV_PCM_FMTBIT_S32_LE | SNDRV_PCM_FMTBIT_S32_BE  )
     },
@@ -380,6 +381,7 @@ static struct adm_mod_codec_pdata *adm_mod_set_pdata_from_of(
     ret = of_property_read_u32(np, "adc_mode0", &pdata->adc_mode0);
     ret = of_property_read_u32(np, "adc_mode1", &pdata->adc_mode1);
     ret = of_property_read_u32(np, "adc_rst", &pdata->adc_rst);
+    ret = of_property_read_u32(np, "bb_detect", &pdata->bb_detect);
 
     printk("adm_mod pcm_en: 0x%X\n", pdata->adc_pcm_en);
 	return  pdata;
@@ -398,6 +400,7 @@ static int adm_mod_spi_probe(struct platform_device *spi)
 {
 	struct adm_mod_private *adm_mod_priv;
 	int ret;
+	struct pinctrl *pinctrl;
 
 	if (!spi->dev.platform_data && !spi->dev.of_node) {
 		dev_err(&spi->dev, "No platform data supplied\n");
@@ -426,6 +429,11 @@ static int adm_mod_spi_probe(struct platform_device *spi)
 		return -EINVAL;
 	}
 
+	pinctrl = devm_pinctrl_get_select_default(&spi->dev);
+	if (IS_ERR(pinctrl))
+		dev_warn(&spi->dev,
+				"pins are not configured from the driver\n");
+
     ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_pcm_en);
     if (ret != 0) goto gpio_fail;
     ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_mbo_en);
@@ -444,6 +452,8 @@ static int adm_mod_spi_probe(struct platform_device *spi)
     if (ret != 0) goto gpio_fail;
     ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_rst);
     if (ret != 0) goto gpio_fail;
+    ret = adm_mod_request_gpio(adm_mod_priv->gpios->bb_detect);
+    if (ret != 0) goto gpio_fail;
 
     gpio_set_value(adm_mod_priv->gpios->adc_pcm_en,      1);
     gpio_set_value(adm_mod_priv->gpios->adc_mbo_en,      0);
@@ -454,7 +464,9 @@ static int adm_mod_spi_probe(struct platform_device *spi)
     gpio_set_value(adm_mod_priv->gpios->adc_mode0,       0);
     gpio_set_value(adm_mod_priv->gpios->adc_mode1,       0);
     gpio_set_value(adm_mod_priv->gpios->adc_rst,         0);
+    gpio_set_value(adm_mod_priv->gpios->bb_detect,       1); /* let cpld know we are in business */
 
+    printk("adm_mod-codec probe succesfull [ret: 0x%X]\n", ret);
 	return ret;
 
 gpio_fail:

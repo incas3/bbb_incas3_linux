@@ -1294,6 +1294,8 @@ static int davinci_mcasp_probe(struct platform_device *pdev)
 		goto err_unregister_dai;
 	}
 
+    printk("davinci-mcasp: probe successfull\n");
+
 	return 0;
 
 err_unregister_dai:

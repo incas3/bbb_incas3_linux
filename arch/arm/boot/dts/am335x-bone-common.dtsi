@@ -47,21 +47,6 @@
 				0x17c 0x73	/* uart1_rtsn.i2c2_scl, SLEWCTRL_SLOW | INPUT_PULLUP | MODE3 */
 			>;
 		};
-
-		mcasp0_pins: mcasp0_pins {
-			pinctrl-single,pins = <
-                0x0cc 0x2b /* {"lcd_data11.mcasp0_ahclkr",OMAP_MUX_MODE3 | AM33XX_PIN_INPUT_PULLDOWN}, */
-                0x0d0 0x2b /* {"lcd_data12.mcasp0_aclkr", OMAP_MUX_MODE3 | AM33XX_PIN_INPUT_PULLDOWN}, */
-                0x0d4 0x2b /* {"lcd_data13.mcasp0_fsr",   OMAP_MUX_MODE3 | AM33XX_PIN_INPUT_PULLDOWN}, */
-                0x0c8 0x2b /* {"lcd_data10.mcasp0_axr0",  OMAP_MUX_MODE3 | AM33XX_PIN_INPUT_PULLDOWN}, */
-
-                0x0c0 0x2b /* {"lcd_data8.mcasp0_aclkx",  OMAP_MUX_MODE3 | AM33XX_PIN_INPUT_PULLDOWN}, */
-                0x0c4 0x2b /* {"lcd_data9.mcasp0_fsx",    OMAP_MUX_MODE3 | AM33XX_PIN_INPUT_PULLDOWN}, */
-                0x0d8 0x0b /* {"lcd_data14.mcasp0_axr1",  OMAP_MUX_MODE3 | AM33XX_PIN_OUTPUT}, */
-                0x0b8 0x2b /* {"lcd_data6.gpio2_10",      OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLDOWN}, b44 - DAC_XFSC */
-                0x0b0 0x2b /* {"lcd_data4.gpio2_12",      OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLDOWN}, b46 - DAC_XCLK */
-			>;
-		};
 	};
 
 	ocp: ocp {
