@@ -377,8 +377,6 @@ static int davinci_evm_probe(struct platform_device *pdev)
 	u32 machine_ver, clk_gpio;
 	int ret = 0;
 
-    printk("davinci_evm_probe\n");
-
 	machine_ver = (u32)match->data;
 	switch (machine_ver) {
 	case MACHINE_VERSION_1:
@@ -387,12 +385,10 @@ static int davinci_evm_probe(struct platform_device *pdev)
 		evm_dai.codec_dai_name	= "cq93vc-hifi";
 		break;
 	case MACHINE_VERSION_2:
-        printk("VERSION 2\n");
 		evm_dai.ops = &evm_ops;
 		evm_dai.init = evm_aic3x_init;
 		break;
 	case MACHINE_VERSION_3:
-        printk("VERSION 3: %s\n", pdev->dev.of_node->name);
         evm_dai.name = "INCAS3_ADM",
         evm_dai.stream_name = "i3_adm",
         evm_dai.codec_dai_name = "adm_mod-hifi",
@@ -410,7 +406,6 @@ static int davinci_evm_probe(struct platform_device *pdev)
 	if (!evm_dai.cpu_of_node)
 		return -EINVAL;
 
-    printk("codec name: %s\n", evm_dai.codec_of_node->name);
 	evm_dai.platform_of_node = evm_dai.cpu_of_node;
 
 	evm_soc_card.dev = &pdev->dev;
@@ -483,7 +478,6 @@ static int __init evm_init(void)
 		evm_snd_dev_data = &da850_snd_soc_card;
 		index = 0;
 	} else {
-        printk("INCAS3 non dt driver\n");
 		evm_snd_dev_data = &am335x_evm_dai;
 		index = 0;
 		return -EINVAL;

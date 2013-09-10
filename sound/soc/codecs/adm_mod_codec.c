@@ -333,7 +333,7 @@ static int adm_mod_request_gpio(unsigned int gpio)
     if (ret < 0)
         return ret;
 
-    printk(KERN_INFO "setting gpio[%i]: to output\n", gpio);
+    //printk(KERN_INFO "setting gpio[%i]: to output\n", gpio);
     gpio_direction_output(gpio, 1);
 
     return ret;
@@ -354,8 +354,6 @@ static struct adm_mod_codec_pdata *adm_mod_set_pdata_from_of(
 			of_match_device(of_match_ptr(adm_mod_dts_ids), &pdev->dev);
 
 	int val, ret = 0;
-
-    printk("adm_mod_set_pdata_from_of\n");
 
 	if (pdev->dev.platform_data) {
 		pdata = pdev->dev.platform_data;
@@ -383,7 +381,6 @@ static struct adm_mod_codec_pdata *adm_mod_set_pdata_from_of(
     ret = of_property_read_u32(np, "adc_rst", &pdata->adc_rst);
     ret = of_property_read_u32(np, "bb_detect", &pdata->bb_detect);
 
-    printk("adm_mod pcm_en: 0x%X\n", pdata->adc_pcm_en);
 	return  pdata;
 
 nodata:
@@ -413,8 +410,6 @@ static int adm_mod_spi_probe(struct platform_device *spi)
 	adm_mod_priv->control_data = spi;
 	adm_mod_priv->control_type = SND_SOC_SPI;
 	platform_set_drvdata(spi, adm_mod_priv);
-
-    printk("amd_mod name: %s\n", spi->dev.of_node->name);
 
 	ret = snd_soc_register_codec(&spi->dev,
 			&soc_codec_dev_adm_mod, &adm_mod_dai, 1);
@@ -466,7 +461,6 @@ static int adm_mod_spi_probe(struct platform_device *spi)
     gpio_set_value(adm_mod_priv->gpios->adc_rst,         0);
     gpio_set_value(adm_mod_priv->gpios->bb_detect,       1); /* let cpld know we are in business */
 
-    printk("adm_mod-codec probe succesfull [ret: 0x%X]\n", ret);
 	return ret;
 
 gpio_fail:
