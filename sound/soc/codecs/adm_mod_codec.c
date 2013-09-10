@@ -285,14 +285,14 @@ static struct snd_soc_dai_driver adm_mod_dai = {
 		.channels_min = 2,
 		.channels_max = 6,
 		.rates = SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_96000 | SNDRV_PCM_RATE_192000 | SNDRV_PCM_RATE_384000,
-        .formats = ( SNDRV_PCM_FMTBIT_S32_LE | SNDRV_PCM_FMTBIT_S32_BE  )
+        .formats = ( SNDRV_PCM_FMTBIT_S32_LE )
     },
 	.capture = {
 		.stream_name = "ADM Capture",
 		.channels_min = 2,
 		.channels_max = 6,
 		.rates = SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_96000 | SNDRV_PCM_RATE_192000 | SNDRV_PCM_RATE_384000,
-        .formats = ( SNDRV_PCM_FMTBIT_S32_LE | SNDRV_PCM_FMTBIT_S32_BE  )
+        .formats = ( SNDRV_PCM_FMTBIT_S32_LE )
     },
 	.ops = &adm_mod_dai_ops,
 };

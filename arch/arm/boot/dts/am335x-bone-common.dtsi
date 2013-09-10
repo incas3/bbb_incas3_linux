@@ -362,6 +362,7 @@
 			};
 
 			/* beaglebone black hdmi on board (No audio) */
+            /*
 			cape@13 {
 				part-number = "BB-BONELT-HDMIN";
 				version@00A0 {
@@ -369,7 +370,7 @@
 					dtbo = "cape-boneblack-hdmin-00A0.dtbo";
 				};
 			};
-
+            */
 		};
 	};
 

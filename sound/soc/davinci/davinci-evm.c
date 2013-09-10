@@ -397,26 +397,7 @@ static int davinci_evm_probe(struct platform_device *pdev)
         evm_dai.stream_name = "i3_adm",
         evm_dai.codec_dai_name = "adm_mod-hifi",
 
-		/*
-		 * Move GPIO handling out of the probe, if probe gets
-		 * deferred, the gpio will have been claimed on previous
-		 * probe and will fail on the second and susequent probes
-		 */
-        /*
-		clk_gpio = of_get_named_gpio(np, "mcasp_clock_enable", 0);
-		if (clk_gpio < 0) {
-		  dev_err(&pdev->dev, "failed to find mcasp_clock enable GPIO!\n");
-		  return -EINVAL;
-		}
-		ret = gpio_request_one(clk_gpio, GPIOF_OUT_INIT_HIGH,
-				       "McASP Clock Enable Pin");
-		if (ret < 0) {
-		  dev_err(&pdev->dev, "Failed to claim McASP Clock Enable pin\n");
-		  return -EINVAL;
-		}
-		gpio_set_value(clk_gpio, 1);
-        */
-		evm_dai.dai_fmt = SND_SOC_DAIFMT_CBS_CFS | SND_SOC_DAIFMT_DSP_B | SND_SOC_DAIFMT_IB_NF;
+		evm_dai.dai_fmt = (SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_CBM_CFM | SND_SOC_DAIFMT_IB_NF);
 		break;
 	}
 
@@ -433,7 +414,6 @@ static int davinci_evm_probe(struct platform_device *pdev)
 	evm_dai.platform_of_node = evm_dai.cpu_of_node;
 
 	evm_soc_card.dev = &pdev->dev;
-	//evm_soc_card.name = "adm_mod-codec";
 	
 	ret = snd_soc_of_parse_card_name(&evm_soc_card, "ti,model");
 	if (ret)
