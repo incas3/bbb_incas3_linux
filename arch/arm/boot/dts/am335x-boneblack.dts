@@ -128,7 +128,7 @@
             adc_mode0 = <51>; /* pin a14: gpio1[19] */
             adc_mode1 = <50>; /* pin a16: gpio1[18] */
             adc_rst = <15>; /* pin a24: gpio0[15] */
-            bb_detect = <26>; /* pin b04: gpio0[28] */
+            bb_detect = <26>; /* pin b14: gpio0[26] */
         };
 
         sound_incas3 {
