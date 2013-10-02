@@ -3,6 +3,7 @@
 
 struct adm_mod_codec_pdata
 {
+    bool gpio_master;
     unsigned int adc_pcm_en;
     unsigned int adc_mbo_en;
     unsigned int adc_dsd_en;

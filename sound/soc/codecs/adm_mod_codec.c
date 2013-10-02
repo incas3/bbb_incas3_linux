@@ -2,7 +2,7 @@
 
 #include <linux/module.h>
 #include <linux/slab.h>
-#include <linux/spi/spi.h>
+//#include <linux/pdef/pdef.h>
 #include <linux/platform_device.h>
 #include <linux/of.h>
 #include <linux/of_platform.h>
@@ -227,34 +227,37 @@ static int adm_mod_hw_params(struct snd_pcm_substream *substream,
 	dev_dbg(codec->dev, "adm_mod hw params buffer_sz: %d\n", buffer_sz);
 	dev_dbg(codec->dev, "adm_mod hw params buffer bytes: %d\n", buffer_bts);
 
-    switch (rate)
+    if (priv->gpios->gpio_master)
     {
-        case 48000:
-            printk("adm set rate: mdiv[1] mode0[0] mode1[0]\n");
-            gpio_set_value(priv->gpios->adc_mdiv,   1);
-            gpio_set_value(priv->gpios->adc_mode0,  0);
-            gpio_set_value(priv->gpios->adc_mode1,  0);
-            break;
-        case 96000:
-            printk("adm set rate: mdiv[1] mode0[0] mode1[1]\n");
-            gpio_set_value(priv->gpios->adc_mdiv,   1);
-            gpio_set_value(priv->gpios->adc_mode0,  0);
-            gpio_set_value(priv->gpios->adc_mode1,  1);
-            break;
-        case 192000:
-            printk("adm set rate: mdiv[1] mode0[1] mode1[0]\n");
-            gpio_set_value(priv->gpios->adc_mdiv,   1);
-            gpio_set_value(priv->gpios->adc_mode0,  1);
-            gpio_set_value(priv->gpios->adc_mode1,  0);
-            break;
-        case 384000:
-            printk("adm set rate: mdiv[0] mode0[1] mode1[1]\n");
-            gpio_set_value(priv->gpios->adc_mdiv,   0);
-            gpio_set_value(priv->gpios->adc_mode0,  1);
-            gpio_set_value(priv->gpios->adc_mode1,  1);
-            break;
-        default:
-            return 1;
+        switch (rate)
+        {
+            case 48000:
+                printk("adm set rate: mdiv[1] mode0[0] mode1[0]\n");
+                gpio_set_value(priv->gpios->adc_mdiv,   1);
+                gpio_set_value(priv->gpios->adc_mode0,  0);
+                gpio_set_value(priv->gpios->adc_mode1,  0);
+                break;
+            case 96000:
+                printk("adm set rate: mdiv[1] mode0[0] mode1[1]\n");
+                gpio_set_value(priv->gpios->adc_mdiv,   1);
+                gpio_set_value(priv->gpios->adc_mode0,  0);
+                gpio_set_value(priv->gpios->adc_mode1,  1);
+                break;
+            case 192000:
+                printk("adm set rate: mdiv[1] mode0[1] mode1[0]\n");
+                gpio_set_value(priv->gpios->adc_mdiv,   1);
+                gpio_set_value(priv->gpios->adc_mode0,  1);
+                gpio_set_value(priv->gpios->adc_mode1,  0);
+                break;
+            case 384000:
+                printk("adm set rate: mdiv[0] mode0[1] mode1[1]\n");
+                gpio_set_value(priv->gpios->adc_mdiv,   0);
+                gpio_set_value(priv->gpios->adc_mode0,  1);
+                gpio_set_value(priv->gpios->adc_mode1,  1);
+                break;
+            default:
+                return 1;
+        }
     }
 
     return 0;
@@ -285,14 +288,14 @@ static struct snd_soc_dai_driver adm_mod_dai = {
 		.channels_min = 2,
 		.channels_max = 6,
 		.rates = SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_96000 | SNDRV_PCM_RATE_192000 | SNDRV_PCM_RATE_384000,
-        .formats = ( SNDRV_PCM_FMTBIT_S32_LE )
+        .formats = ( SNDRV_PCM_FMTBIT_S32_LE ),
     },
 	.capture = {
 		.stream_name = "ADM Capture",
 		.channels_min = 2,
 		.channels_max = 6,
 		.rates = SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_96000 | SNDRV_PCM_RATE_192000 | SNDRV_PCM_RATE_384000,
-        .formats = ( SNDRV_PCM_FMTBIT_S32_LE )
+        .formats = ( SNDRV_PCM_FMTBIT_S32_LE ),
     },
 	.ops = &adm_mod_dai_ops,
 };
@@ -352,7 +355,7 @@ static struct adm_mod_codec_pdata *adm_mod_set_pdata_from_of(
     struct adm_mod_codec_pdata *pdata = NULL;
 	const struct of_device_id *match =
 			of_match_device(of_match_ptr(adm_mod_dts_ids), &pdev->dev);
-
+    int gpio_master;
 	int val, ret = 0;
 
 	if (pdev->dev.platform_data) {
@@ -370,16 +373,22 @@ static struct adm_mod_codec_pdata *adm_mod_set_pdata_from_of(
 		goto nodata;
 	}
 
-	ret = of_property_read_u32(np, "adc_pcm_en", &pdata->adc_pcm_en);
-    ret = of_property_read_u32(np, "adc_mbo_en", &pdata->adc_mbo_en);
-    ret = of_property_read_u32(np, "adc_dsd_en", &pdata->adc_dsd_en);
-    ret = of_property_read_u32(np, "adc_pcm_ms", &pdata->adc_pcm_ms);
-    ret = of_property_read_u32(np, "adc_mdiv", &pdata->adc_mdiv);
-    ret = of_property_read_u32(np, "adc_hpfb", &pdata->adc_hpfb);
-    ret = of_property_read_u32(np, "adc_mode0", &pdata->adc_mode0);
-    ret = of_property_read_u32(np, "adc_mode1", &pdata->adc_mode1);
-    ret = of_property_read_u32(np, "adc_rst", &pdata->adc_rst);
-    ret = of_property_read_u32(np, "bb_detect", &pdata->bb_detect);
+    pdata->gpio_master = false;
+	ret = of_property_read_u32(np, "gpio_master", &gpio_master);
+    if (gpio_master == 1)
+    {
+        pdata->gpio_master = true;
+        ret = of_property_read_u32(np, "adc_pcm_en", &pdata->adc_pcm_en);
+        ret = of_property_read_u32(np, "adc_mbo_en", &pdata->adc_mbo_en);
+        ret = of_property_read_u32(np, "adc_dsd_en", &pdata->adc_dsd_en);
+        ret = of_property_read_u32(np, "adc_pcm_ms", &pdata->adc_pcm_ms);
+        ret = of_property_read_u32(np, "adc_mdiv", &pdata->adc_mdiv);
+        ret = of_property_read_u32(np, "adc_hpfb", &pdata->adc_hpfb);
+        ret = of_property_read_u32(np, "adc_mode0", &pdata->adc_mode0);
+        ret = of_property_read_u32(np, "adc_mode1", &pdata->adc_mode1);
+        ret = of_property_read_u32(np, "adc_rst", &pdata->adc_rst);
+        ret = of_property_read_u32(np, "bb_detect", &pdata->bb_detect);
+    }
 
 	return  pdata;
 
@@ -393,91 +402,94 @@ nodata:
 }
 
 
-static int adm_mod_spi_probe(struct platform_device *spi)
+static int adm_mod_pdef_probe(struct platform_device *pdef)
 {
 	struct adm_mod_private *adm_mod_priv;
 	int ret;
 	struct pinctrl *pinctrl;
 
-	if (!spi->dev.platform_data && !spi->dev.of_node) {
-		dev_err(&spi->dev, "No platform data supplied\n");
+	if (!pdef->dev.platform_data && !pdef->dev.of_node) {
+		dev_err(&pdef->dev, "No platform data supplied\n");
 		return -EINVAL;
 	}
 
     adm_mod_priv = kzalloc(sizeof(struct adm_mod_private), GFP_KERNEL);
     if (adm_mod_priv == NULL) return -ENOMEM;
 
-	adm_mod_priv->control_data = spi;
+	adm_mod_priv->control_data = pdef;
 	adm_mod_priv->control_type = SND_SOC_SPI;
-	platform_set_drvdata(spi, adm_mod_priv);
+	platform_set_drvdata(pdef, adm_mod_priv);
 
-	ret = snd_soc_register_codec(&spi->dev,
+	ret = snd_soc_register_codec(&pdef->dev,
 			&soc_codec_dev_adm_mod, &adm_mod_dai, 1);
 	if (ret < 0)
     {
         goto soc_register_fail;
     }
 
-	adm_mod_priv->gpios = adm_mod_set_pdata_from_of(spi);
+	adm_mod_priv->gpios = adm_mod_set_pdata_from_of(pdef);
 	if (!adm_mod_priv->gpios) {
-		dev_err(&spi->dev, "no platform data\n");
+		dev_err(&pdef->dev, "no platform data\n");
 		return -EINVAL;
 	}
 
-	pinctrl = devm_pinctrl_get_select_default(&spi->dev);
+	pinctrl = devm_pinctrl_get_select_default(&pdef->dev);
 	if (IS_ERR(pinctrl))
-		dev_warn(&spi->dev,
+		dev_warn(&pdef->dev,
 				"pins are not configured from the driver\n");
 
-    ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_pcm_en);
-    if (ret != 0) goto gpio_fail;
-    ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_mbo_en);
-    if (ret != 0) goto gpio_fail;
-    ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_dsd_en);
-    if (ret != 0) goto gpio_fail;
-    ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_pcm_ms);
-    if (ret != 0) goto gpio_fail;
-    ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_mdiv);
-    if (ret != 0) goto gpio_fail;
-    ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_hpfb);
-    if (ret != 0) goto gpio_fail;
-    ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_mode0);
-    if (ret != 0) goto gpio_fail;
-    ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_mode1);
-    if (ret != 0) goto gpio_fail;
-    ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_rst);
-    if (ret != 0) goto gpio_fail;
-    ret = adm_mod_request_gpio(adm_mod_priv->gpios->bb_detect);
-    if (ret != 0) goto gpio_fail;
+    if (adm_mod_priv->gpios->gpio_master)
+    {
+        ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_pcm_en);
+        if (ret != 0) goto gpio_fail;
+        ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_mbo_en);
+        if (ret != 0) goto gpio_fail;
+        ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_dsd_en);
+        if (ret != 0) goto gpio_fail;
+        ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_pcm_ms);
+        if (ret != 0) goto gpio_fail;
+        ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_mdiv);
+        if (ret != 0) goto gpio_fail;
+        ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_hpfb);
+        if (ret != 0) goto gpio_fail;
+        ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_mode0);
+        if (ret != 0) goto gpio_fail;
+        ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_mode1);
+        if (ret != 0) goto gpio_fail;
+        ret = adm_mod_request_gpio(adm_mod_priv->gpios->adc_rst);
+        if (ret != 0) goto gpio_fail;
+        ret = adm_mod_request_gpio(adm_mod_priv->gpios->bb_detect);
+        if (ret != 0) goto gpio_fail;
 
-    gpio_set_value(adm_mod_priv->gpios->adc_pcm_en,      1);
-    gpio_set_value(adm_mod_priv->gpios->adc_mbo_en,      0);
-    gpio_set_value(adm_mod_priv->gpios->adc_dsd_en,      0);
-    gpio_set_value(adm_mod_priv->gpios->adc_pcm_ms,      1);
-    gpio_set_value(adm_mod_priv->gpios->adc_mdiv,        1);
-    gpio_set_value(adm_mod_priv->gpios->adc_hpfb,        0);
-    gpio_set_value(adm_mod_priv->gpios->adc_mode0,       0);
-    gpio_set_value(adm_mod_priv->gpios->adc_mode1,       0);
-    gpio_set_value(adm_mod_priv->gpios->adc_rst,         0);
-    gpio_set_value(adm_mod_priv->gpios->bb_detect,       1); /* let cpld know we are in business */
+        gpio_set_value(adm_mod_priv->gpios->adc_pcm_en,      1);
+        gpio_set_value(adm_mod_priv->gpios->adc_mbo_en,      0);
+        gpio_set_value(adm_mod_priv->gpios->adc_dsd_en,      0);
+        gpio_set_value(adm_mod_priv->gpios->adc_pcm_ms,      1);
+        gpio_set_value(adm_mod_priv->gpios->adc_mdiv,        1);
+        gpio_set_value(adm_mod_priv->gpios->adc_hpfb,        0);
+        gpio_set_value(adm_mod_priv->gpios->adc_mode0,       1);
+        gpio_set_value(adm_mod_priv->gpios->adc_mode1,       0);
+        gpio_set_value(adm_mod_priv->gpios->adc_rst,         0);
+        gpio_set_value(adm_mod_priv->gpios->bb_detect,       1); /* let cpld know we are in business */
+    }
 
 	return ret;
 
 gpio_fail:
-	snd_soc_unregister_codec(&spi->dev);
+	snd_soc_unregister_codec(&pdef->dev);
 soc_register_fail:
-	kfree(platform_get_drvdata(spi));
+	kfree(platform_get_drvdata(pdef));
     return ret;
 }
 
-static int adm_mod_spi_remove(struct platform_device *spi)
+static int adm_mod_pdef_remove(struct platform_device *pdef)
 {
-	snd_soc_unregister_codec(&spi->dev);
-	kfree(platform_get_drvdata(spi));
+	snd_soc_unregister_codec(&pdef->dev);
+	kfree(platform_get_drvdata(pdef));
 	return 0;
 }
 
-static struct platform_driver adm_mod_spi_driver = 
+static struct platform_driver adm_mod_pdef_driver = 
 {
     .driver  = 
     {
@@ -485,19 +497,19 @@ static struct platform_driver adm_mod_spi_driver =
         .owner  = THIS_MODULE,
         .of_match_table = adm_mod_dts_ids,
     },
-    .probe  = adm_mod_spi_probe,
-    .remove = adm_mod_spi_remove,
+    .probe  = adm_mod_pdef_probe,
+    .remove = adm_mod_pdef_remove,
 };
 
 static int __init adm_mod_init(void)
 {
-    return platform_driver_register(&adm_mod_spi_driver);
+    return platform_driver_register(&adm_mod_pdef_driver);
 }
 module_init(adm_mod_init);
 
 static void __exit adm_mod_exit(void)
 {
-    platform_driver_unregister(&adm_mod_spi_driver);
+    platform_driver_unregister(&adm_mod_pdef_driver);
 }
 module_exit(adm_mod_exit);
 
