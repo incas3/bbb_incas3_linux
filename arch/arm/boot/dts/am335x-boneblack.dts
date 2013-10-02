@@ -25,8 +25,8 @@
             0x0d0 0x2b /* aclkr p8_35, MUX_MODE3 | PIN_INPUT_PULLDOWN */
             0x0d4 0x2b /* fsr   p8_33, MUX_MODE3 | PIN_INPUT_PULLDOWN */
             0x0c8 0x2b /* axr0  p8_36, MUX_MODE3 | PIN_INPUT_PULLDOWN */
-            0x0dc 0x2c /* axr3  p8_32, MUX_MODE4 | PIN_INPUT_PULLDOWN */
-            0x0cc 0x2c /* axr2  p8_34, MUX_MODE4 | PIN_INPUT_PULLDOWN */
+            #0x0dc 0x2c /* axr3  p8_32, MUX_MODE4 | PIN_INPUT_PULLDOWN */
+            #0x0cc 0x2c /* axr2  p8_34, MUX_MODE4 | PIN_INPUT_PULLDOWN */
 
             /* mcasp0 output */
             0x0c0 0x2b /* aclkx p8_37, MUX_MODE3 | PIN_INPUT_PULLDOWN */
@@ -35,17 +35,17 @@
         >;
     };
 
-    mcasp1_pins_incas3: pinmux_mcasp1_pins {
-		pinctrl-single,pins = <
-            /* mcasp1 output */
-            0x1b4 0x27 /* axr0_a  p9_41a, MUX_MODE7 | PIN_INPUT */
-            0x164 0x27 /* aclkx_a p9_42a, MUX_MODE7 | PIN_INPUT */
-
-            0x1a8 0x0b /* axr0_b  p9_41b, MUX_MODE3 | PIN_OUTPUT */
-            0x1a0 0x2b /* aclkx_b p9_42b, MUX_MODE3 | PIN_INPUT_PULLDOWN */
-            0x1a4 0x2b /* fsx     p9_27, MUX_MODE3  | PIN_INPUT_PULLDOWN */
-        >;
-    };
+#    mcasp1_pins_incas3: pinmux_mcasp1_pins {
+#		pinctrl-single,pins = <
+#            /* mcasp1 output */
+#            0x1b4 0x27 /* axr0_a  p9_41a, MUX_MODE7 | PIN_INPUT */
+#            0x164 0x27 /* aclkx_a p9_42a, MUX_MODE7 | PIN_INPUT */
+#
+#            0x1a8 0x0b /* axr0_b  p9_41b, MUX_MODE3 | PIN_OUTPUT */
+#            0x1a0 0x2b /* aclkx_b p9_42b, MUX_MODE3 | PIN_INPUT_PULLDOWN */
+#            0x1a4 0x2b /* fsx     p9_27, MUX_MODE3  | PIN_INPUT_PULLDOWN */
+#        >;
+#    };
 
     mcasp0_adc_pins: pinmux_adc_pins {
 		pinctrl-single,pins = <
@@ -125,20 +125,20 @@
     rx-num-evt = <1>;
 };
 
-&mcasp1 {
-    pinctrl-names = "default";
-    pinctrl-0 = <&mcasp1_pins_incas3>;
+#&mcasp1 {
+#    pinctrl-names = "default";
+#    pinctrl-0 = <&mcasp1_pins_incas3>;
 
-    status = "okay";
+#    status = "okay";
 
-    op-mode = <0>; /*  MCASP_IIS_MODE */
-    num-serializer = <2>;
-    serial-dir = < 1 1 >; /* 0: INACTIVE, 1: TX, 2: RX */
-    tdm-slots = <2>;
+#    op-mode = <0>; /*  MCASP_IIS_MODE */
+#    num-serializer = <2>;
+#    serial-dir = < 1 1 >; /* 0: INACTIVE, 1: TX, 2: RX */
+#    tdm-slots = <2>;
 
-    tx-num-evt = <1>;
-    rx-num-evt = <1>;
-};
+#    tx-num-evt = <1>;
+#    rx-num-evt = <1>;
+#};
 
 / {
     ocp {
@@ -171,29 +171,29 @@
             ti,codec-clock-rate = <12000000>;
         };
 
-        mcasp1_codec: adc@1 { 
-            compatible = "adm_mod-codec";
-            status = "okay";
-
-            gpio_master = <0>;
-            adc_pcm_en = <0>; /* ignore */
-            adc_mbo_en = <0>; /* ignore */ 
-            adc_dsd_en = <0>; /* ignore */ 
-            adc_pcm_ms = <0>; /* ignore */
-            adc_mdiv = <0>; /* ignore */
-            adc_hpfb = <0>; /* ignore */
-            adc_mode0 = <0>; /* ignore */
-            adc_mode1 = <0>; /* ignore */
-            adc_rst = <0>; /* ignore */
-            bb_detect = <0>; /* ignore */
-        };
-
-        sound_incas3_mcasp1 {
-            compatible = "ti,am33xx-beaglebone-black";
-            ti,model = "INCAS3 ADM mcasp1";
-            ti,audio-codec = <&mcasp1_codec>;
-            ti,mcasp-controller = <&mcasp1>;
-            ti,codec-clock-rate = <12000000>;
-        };
+#        mcasp1_codec: adc@1 { 
+#            compatible = "adm_mod-codec";
+#            status = "okay";
+#
+#            gpio_master = <0>;
+#            adc_pcm_en = <0>; /* ignore */
+#            adc_mbo_en = <0>; /* ignore */ 
+#            adc_dsd_en = <0>; /* ignore */ 
+#            adc_pcm_ms = <0>; /* ignore */
+#            adc_mdiv = <0>; /* ignore */
+#            adc_hpfb = <0>; /* ignore */
+#            adc_mode0 = <0>; /* ignore */
+#            adc_mode1 = <0>; /* ignore */
+#            adc_rst = <0>; /* ignore */
+#            bb_detect = <0>; /* ignore */
+#        };
+#
+#        sound_incas3_mcasp1 {
+#            compatible = "ti,am33xx-beaglebone-black";
+#            ti,model = "INCAS3 ADM mcasp1";
+#            ti,audio-codec = <&mcasp1_codec>;
+#            ti,mcasp-controller = <&mcasp1>;
+#            ti,codec-clock-rate = <12000000>;
+#        };
     };
 };
