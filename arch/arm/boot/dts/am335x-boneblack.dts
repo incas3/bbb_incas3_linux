@@ -169,7 +169,7 @@
             ti,model = "INCAS3 ADM mcasp0";
             ti,audio-codec = <&mcasp0_codec>;
             ti,mcasp-controller = <&mcasp0>;
-            ti,codec-clock-rate = <12000000>;
+            ti,codec-clock-rate = <24000000>;
         };
 
         mcasp1_codec: adc@1 { 
@@ -194,7 +194,7 @@
             ti,model = "INCAS3 ADM mcasp1";
             ti,audio-codec = <&mcasp1_codec>;
             ti,mcasp-controller = <&mcasp1>;
-            ti,codec-clock-rate = <12000000>;
+            ti,codec-clock-rate = <24000000>;
         };
     };
 };
