@@ -32,7 +32,7 @@
             /* mcasp0 output */
             0x0c0 0x2b /* aclkx p8_37, MUX_MODE3 | PIN_INPUT_PULLDOWN */
             0x0c4 0x2b /* fsx   p8_38, MUX_MODE3 | PIN_INPUT_PULLDOWN */
-            0x0d8 0x0b /* axr1  p8_31, MUX_MODE3 | PIN_OUTPUT */
+            0x0d8 0x0b /* axr1  p8_31, MUX_MODE3 | PIN_OUTPUT_PULLDOWN */
         >;
     };
 
@@ -42,7 +42,7 @@
             0x1b4 0x27 /* axr0_a  p9_41a, MUX_MODE7 | PIN_INPUT */
             0x164 0x27 /* aclkx_a p9_42a, MUX_MODE7 | PIN_INPUT */
 
-            0x1a8 0x0b /* axr0_b  p9_41b, MUX_MODE3 | PIN_OUTPUT */
+            0x1a8 0x0b /* axr0_b  p9_41b, MUX_MODE3 | PIN_OUTPUT_PULLDOWN */
             0x1a0 0x2b /* aclkx_b p9_42b, MUX_MODE3 | PIN_INPUT_PULLDOWN */
             0x1a4 0x2b /* fsx     p9_27, MUX_MODE3  | PIN_INPUT_PULLDOWN */
         >;
