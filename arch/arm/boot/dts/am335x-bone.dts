@@ -40,7 +40,7 @@
             0x048 0x0f /* p9_14, MUX_MODE7 | PIN_OUTPUT adc_mode0 */
             0x04c 0x0f /* p9_16, MUX_MODE7 | PIN_OUTPUT adc_mode1 */
             0x184 0x0f /* p9_24, MUX_MODE7 | PIN_OUTPUT adc_rst */
-            0x028 0x0f /* p8_14, MUX_MODE7 | PIN_OUTPUT bb_detect */
+            0x01c 0x0f /* p8_04, MUX_MODE7 | PIN_OUTPUT bb_detect */
         >;
     };
 };
