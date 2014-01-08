@@ -203,28 +203,14 @@ static ssize_t show_humid(struct device *dev,
 static ssize_t show_gps(struct device *dev,
 			 struct device_attribute *devattr, char *buf)
 {
-   int32_t lat,lon;
-  //u16 humid;
-	//int nr = to_sensor_dev_attr_2(devattr)->nr;
-	//int index = to_sensor_dev_attr_2(devattr)->index;
-	//struct bbboard_data *data = bbboard_update_device(dev);
+  int32_t lat,lon;
   struct i2c_client *client = to_i2c_client(dev);
-
-	//if (IS_ERR(data))
-	//	return PTR_ERR(data);
   
-  lat = (i2c_smbus_read_word_data(client, READ_GPS_LAT_LOW_CMD)<<8)+
+  lat = (i2c_smbus_read_word_data(client, READ_GPS_LAT_LOW_CMD)<<16)+
         (i2c_smbus_read_word_data(client, READ_GPS_LAT_HIGH_CMD)&0xffff);
   
-  lon = (i2c_smbus_read_word_data(client, READ_GPS_LON_LOW_CMD)<<8)+
+  lon = (i2c_smbus_read_word_data(client, READ_GPS_LON_LOW_CMD)<<16)+
         (i2c_smbus_read_word_data(client, READ_GPS_LON_HIGH_CMD)&0xffff);
-  
-	//reg = BBBOARD_TEMP_MSB_READ[1][0];
-	//val = i2c_smbus_read_block_data(client, READ_GPS_NEMA_CMD,i2c_buf);
-  //humid = val << 8;
-	//reg = BBBOARD_TEMP_LSB[1][0];
-	//val = i2c_smbus_read_byte_data(client, READ_HUMID_LSB_CMD);
-  //humid += val;
 
 	return sprintf(buf, "lat: %d lon: %d\n",lat,lon);
 }
@@ -232,24 +218,12 @@ static ssize_t show_gps(struct device *dev,
 static ssize_t show_dac(struct device *dev,
 			 struct device_attribute *devattr, char *buf)
 {
-  //u8 val;
   u16 dac_val;
-	//int nr = to_sensor_dev_attr_2(devattr)->nr;
-	//int index = to_sensor_dev_attr_2(devattr)->index;
-	//struct bbboard_data *data = bbboard_update_device(dev);
   struct i2c_client *client = to_i2c_client(dev);
 
-	//if (IS_ERR(data))
-	//	return PTR_ERR(data);
+  dac_val = i2c_smbus_read_word_data(client, READ_DAC_CMD);
 
-	//reg = BBBOARD_TEMP_MSB_READ[2][0];
-	dac_val = i2c_smbus_read_word_data(client, READ_DAC_CMD);
-  //dac_val = val << 8;
-	//reg = BBBOARD_TEMP_LSB[2][0];
-	//val = i2c_smbus_read_byte_data(client, READ_DAC_LSB_CMD);
-  //dac_val += val;
-
-	return sprintf(buf, "%d\n",dac_val);
+  return sprintf(buf, "%d\n",dac_val);
 }
 
 static ssize_t show_adc(struct device *dev,
