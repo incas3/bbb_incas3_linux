@@ -212,7 +212,7 @@ static ssize_t show_gps(struct device *dev,
   lon = (i2c_smbus_read_word_data(client, READ_GPS_LON_HIGH_CMD)<<16 |
   	i2c_smbus_read_word_data(client, READ_GPS_LON_LOW_CMD));
 
-	return sprintf(buf, "lat: %d lon: %d\n",lat,lon);
+	return sprintf(buf, "lat: %d lon: %d\nflat: %f flon: %f\n",lat/1000000.0,lon/1000000.0);
 }
 
 static ssize_t show_dac(struct device *dev,
