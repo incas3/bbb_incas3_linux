@@ -206,11 +206,11 @@ static ssize_t show_gps(struct device *dev,
   int32_t lat,lon;
   struct i2c_client *client = to_i2c_client(dev);
   
-  lat = (i2c_smbus_read_word_data(client, READ_GPS_LAT_LOW_CMD)<<16)+
-        (i2c_smbus_read_word_data(client, READ_GPS_LAT_HIGH_CMD)&0xffff);
+  lat = (i2c_smbus_read_word_data(client, READ_GPS_LAT_HIGH_CMD)<<16 |
+  	i2c_smbus_read_word_data(client, READ_GPS_LAT_LOW_CMD));
   
-  lon = (i2c_smbus_read_word_data(client, READ_GPS_LON_LOW_CMD)<<16)+
-        (i2c_smbus_read_word_data(client, READ_GPS_LON_HIGH_CMD)&0xffff);
+  lon = (i2c_smbus_read_word_data(client, READ_GPS_LON_HIGH_CMD)<<16 |
+  	i2c_smbus_read_word_data(client, READ_GPS_LON_LOW_CMD));
 
 	return sprintf(buf, "lat: %d lon: %d\n",lat,lon);
 }
