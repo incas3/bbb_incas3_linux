@@ -261,14 +261,14 @@ static int adm_mod_hw_params(struct snd_pcm_substream *substream,
     
         {
             //adc reset high
-            gpio_set_value(adm_mod_priv->gpios->adc_rst, 1);
+            gpio_set_value(priv->gpios->adc_rst, 1);
 
             //sleep for 2500 fs cycles
             //msleep( ( (rate * 1000) / 2500) + 1);
             msleep(1000);
 
             //adc reset low
-            gpio_set_value(adm_mod_priv->gpios->adc_rst, 0);
+            gpio_set_value(priv->gpios->adc_rst, 0);
         }
     }
 
