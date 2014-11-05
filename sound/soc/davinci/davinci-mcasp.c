@@ -444,6 +444,9 @@ static void mcasp_stop_tx(struct davinci_audio_dev *dev)
 
 static void davinci_mcasp_stop(struct davinci_audio_dev *dev, int stream)
 {
+    u8 dir = (stream == SNDRV_PCM_STREAM_PLAYBACK) ? TX_MODE : RX_MODE;
+    int i = 0;
+
 	if (stream == SNDRV_PCM_STREAM_PLAYBACK) {
 		if (dev->txnumevt) {	/* disable FIFO */
 			switch (dev->version) {
@@ -472,6 +475,13 @@ static void davinci_mcasp_stop(struct davinci_audio_dev *dev, int stream)
 		}
 		mcasp_stop_rx(dev);
 	}
+
+    /*  turn stream off */
+    for (i = 0; i < mcasp->num_serializer; i++) {
+        if (mcasp->serial_dir[i] == dir) {
+            mcasp_set_reg(mcasp, DAVINCI_MCASP_XRSRCTL_REG(i), 0);
+        }
+    }
 }
 
 static int davinci_mcasp_set_dai_fmt(struct snd_soc_dai *cpu_dai,
@@ -542,12 +552,10 @@ static int davinci_mcasp_set_dai_fmt(struct snd_soc_dai *cpu_dai,
 
 	switch (fmt & SND_SOC_DAIFMT_INV_MASK) {
 	case SND_SOC_DAIFMT_IB_NF:
-		//cpe mcasp_clr_bits(base + DAVINCI_MCASP_ACLKXCTL_REG, ACLKXPOL);
 		mcasp_set_bits(base + DAVINCI_MCASP_ACLKXCTL_REG, ACLKXPOL);
-		//cpe mcasp_clr_bits(base + DAVINCI_MCASP_TXFMCTL_REG, FSXPOL);
-		mcasp_set_bits(base + DAVINCI_MCASP_TXFMCTL_REG, FSXPOL);
-
 		mcasp_set_bits(base + DAVINCI_MCASP_ACLKRCTL_REG, ACLKRPOL);
+
+		mcasp_set_bits(base + DAVINCI_MCASP_TXFMCTL_REG, FSXPOL);
 		mcasp_clr_bits(base + DAVINCI_MCASP_RXFMCTL_REG, FSRPOL);
 		break;
 
@@ -697,22 +705,23 @@ static int davinci_hw_common_param(struct davinci_audio_dev *dev, int stream,
 	}
 
 	for (i = 0; i < dev->num_serializer; i++) {
-		mcasp_set_bits(dev->base + DAVINCI_MCASP_XRSRCTL_REG(i),
-					dev->serial_dir[i]);
 		if (dev->serial_dir[i] == TX_MODE &&
 					tx_ser < max_active_serializers) {
 			mcasp_set_bits(dev->base + DAVINCI_MCASP_PDIR_REG,
 					AXR(i));
 			tx_ser++;
+            active = true;
 		} else if (dev->serial_dir[i] == RX_MODE &&
 					rx_ser < max_active_serializers) {
 			mcasp_clr_bits(dev->base + DAVINCI_MCASP_PDIR_REG,
 					AXR(i));
 			rx_ser++;
-		} else {
-			mcasp_mod_bits(dev->base + DAVINCI_MCASP_XRSRCTL_REG(i),
-					SRMOD_INACTIVE, SRMOD_MASK);
-		}
+            active = true;
+
+        if (active) {
+            mcasp_set_bits(dev->base + DAVINCI_MCASP_XRSRCTL_REG(i),
+                        dev->serial_dir[i]);
+        }
 	}
 
 	if (stream == SNDRV_PCM_STREAM_PLAYBACK)
