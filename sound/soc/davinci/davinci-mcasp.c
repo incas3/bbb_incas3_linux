@@ -477,9 +477,9 @@ static void davinci_mcasp_stop(struct davinci_audio_dev *dev, int stream)
 	}
 
     /*  turn stream off */
-    for (i = 0; i < mcasp->num_serializer; i++) {
-        if (mcasp->serial_dir[i] == dir) {
-            mcasp_set_reg(mcasp, DAVINCI_MCASP_XRSRCTL_REG(i), 0);
+    for (i = 0; i < dev->num_serializer; i++) {
+        if (dev->serial_dir[i] == dir) {
+            mcasp_set_reg(dev->base + DAVINCI_MCASP_XRSRCTL_REG(i), 0);
         }
     }
 }
@@ -705,6 +705,8 @@ static int davinci_hw_common_param(struct davinci_audio_dev *dev, int stream,
 	}
 
 	for (i = 0; i < dev->num_serializer; i++) {
+        bool active = false;
+
 		if (dev->serial_dir[i] == TX_MODE &&
 					tx_ser < max_active_serializers) {
 			mcasp_set_bits(dev->base + DAVINCI_MCASP_PDIR_REG,
@@ -717,6 +719,7 @@ static int davinci_hw_common_param(struct davinci_audio_dev *dev, int stream,
 					AXR(i));
 			rx_ser++;
             active = true;
+        }
 
         if (active) {
             mcasp_set_bits(dev->base + DAVINCI_MCASP_XRSRCTL_REG(i),
