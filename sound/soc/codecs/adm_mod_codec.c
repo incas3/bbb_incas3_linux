@@ -230,7 +230,8 @@ static int adm_mod_hw_params(struct snd_pcm_substream *substream,
     if (priv->gpios->gpio_master)
     {
         //adc reset high
-        gpio_set_value(priv->gpios->adc_rst, 1);
+        gpio_set_value(priv->gpios->adc_rst, 0);
+        dev_dbg(codec->dev, "adm_mod adc reset\n");
 
         switch (rate)
         {
@@ -262,11 +263,12 @@ static int adm_mod_hw_params(struct snd_pcm_substream *substream,
                 return 1;
         }
 
+        //adc reset low
+        gpio_set_value(priv->gpios->adc_rst, 1);
+
+
         //sleep for 2500fs cycles
         msleep( ( 2500 / (rate / 1000) ) + 1);
-
-        //adc reset low
-        gpio_set_value(priv->gpios->adc_rst, 0);
     }
 
     return 0;
@@ -478,7 +480,7 @@ static int adm_mod_pdef_probe(struct platform_device *pdef)
         gpio_set_value(adm_mod_priv->gpios->adc_hpfb,        0);
         gpio_set_value(adm_mod_priv->gpios->adc_mode0,       1);
         gpio_set_value(adm_mod_priv->gpios->adc_mode1,       0);
-        gpio_set_value(adm_mod_priv->gpios->adc_rst,         0);
+        gpio_set_value(adm_mod_priv->gpios->adc_rst,         1);
         gpio_set_value(adm_mod_priv->gpios->bb_detect,       1); /* let cpld know we are in business */
     }
 
